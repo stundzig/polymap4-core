@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry exported="true" kind="lib" path="lib-refine/butterfly-1.0.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/ant-tools-1.8.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/arithcode-1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/clojure-1.5.1-slim.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/commons-codec-1.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/commons-collections-3.2.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/commons-fileupload-1.2.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/commons-io-1.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/commons-lang-2.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/commons-logging-1.1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/dom4j-1.6.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/fluent-hc-4.2.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/guava-13.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/httpclient-4.2.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/httpcore-4.2.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/httpmime-4.2.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/icu4j-4.2.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/jackson-core-asl-1.9.12.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/jcl-over-slf4j-1.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/jrdf-0.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/json-20100208.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/jsoup-1.4.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/lessen-trunk-r8.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/log4j-1.2.15.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/marc4j-2.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/odfdom-java-0.8.7.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/opencsv-2.4-SNAPSHOT.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/poi-3.12-20150511.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/poi-ooxml-3.12-20150511.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/poi-ooxml-schemas-3.12-20150511.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/resolver.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/rhino-1.7R2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/secondstring-20100303.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/serializer.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/signpost-commonshttp4-1.2.1.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/signpost-core-1.2.1.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/slf4j-api-1.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/slf4j-log4j12-1.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/velocity-1.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/vicino-1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/xercesImpl-2.11.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/xml-apis.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/xmlbeans-2.3.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/openrefine-trunk.jar" sourcepath="/OpenRefine/main/src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="src-test"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
