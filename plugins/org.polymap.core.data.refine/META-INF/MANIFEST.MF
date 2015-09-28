@@ -54,4 +54,7 @@ Bundle-ClassPath: lib-refine/openrefine-trunk.jar,
  lib-refine/xercesImpl-2.11.jar,
  lib-refine/xml-apis.jar,
  lib-refine/xmlbeans-2.3.0.jar,
- lib-refine/butterfly-1.0.1.jar
+ lib-refine/butterfly-1.0.1.jar,
+ lib-refine/poi-ooxml-3.13-20150929.jar,
+ lib-refine/poi-ooxml-schemas-3.13-20150929.jar,
+ lib-refine/poi-3.13-20150929.jar

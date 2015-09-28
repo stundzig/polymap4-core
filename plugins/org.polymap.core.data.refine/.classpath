@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry exported="true" kind="lib" path="lib-refine/butterfly-1.0.1.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="src-test"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/openrefine-trunk.jar" sourcepath="/OpenRefine/main/src"/>
 	<classpathentry exported="true" kind="lib" path="lib-refine/ant-tools-1.8.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib-refine/arithcode-1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib-refine/clojure-1.5.1-slim.jar"/>
@@ -27,9 +31,6 @@
 	<classpathentry exported="true" kind="lib" path="lib-refine/marc4j-2.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib-refine/odfdom-java-0.8.7.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib-refine/opencsv-2.4-SNAPSHOT.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib-refine/poi-3.12-20150511.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib-refine/poi-ooxml-3.12-20150511.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib-refine/poi-ooxml-schemas-3.12-20150511.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib-refine/resolver.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib-refine/rhino-1.7R2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib-refine/secondstring-20100303.jar"/>
@@ -43,10 +44,9 @@
 	<classpathentry exported="true" kind="lib" path="lib-refine/xercesImpl-2.11.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib-refine/xml-apis.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib-refine/xmlbeans-2.3.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib-refine/openrefine-trunk.jar" sourcepath="/OpenRefine/main/src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
-	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="src" path="src-test"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/butterfly-1.0.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/poi-ooxml-3.13-20150929.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/poi-ooxml-schemas-3.13-20150929.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib-refine/poi-3.13-20150929.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
