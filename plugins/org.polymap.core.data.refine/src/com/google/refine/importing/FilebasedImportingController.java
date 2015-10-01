@@ -36,7 +36,7 @@ package com.google.refine.importing;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.text.NumberFormat;
+import java.io.InputStream;
 import java.util.Properties;
 
 import javax.servlet.ServletException;
@@ -49,7 +49,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.polymap.core.data.refine.impl.RefineRequest;
-import org.polymap.core.data.refine.impl.RefineServiceImpl;
 
 import com.google.refine.commands.HttpUtilities;
 import com.google.refine.importing.ImportingUtilities.Progress;
@@ -194,9 +193,9 @@ public class FilebasedImportingController
         JSONArray fileRecords = new JSONArray();
         JSONUtilities.safePut( retrievalRecord, "files", fileRecords );
         if (request.file() != null) {
-            File origin = request.file();
+            InputStream origin = request.file();
 
-            File file = ImportingUtilities.allocateFile( rawDataDir, origin.getName() );
+            File file = ImportingUtilities.allocateFile( rawDataDir, request.getParameter( "fileName" ) );
 
             JSONObject fileRecord = new JSONObject();
             JSONUtilities.safePut( fileRecord, "origin", "upload" );
@@ -213,7 +212,7 @@ public class FilebasedImportingController
             // update.totalRetrievedSize ) );
 
             JSONUtilities.safePut( fileRecord, "size", ImportingUtilities
-                    .saveStreamToFile( new FileInputStream( origin ), file, null ) );
+                    .saveStreamToFile( origin, file, null ) );
             ImportingUtilities.postProcessRetrievedFile( rawDataDir, file, fileRecord, fileRecords,
                     progress );
         }

@@ -262,7 +262,7 @@ public class RefineResponse
     }
 
 
-    @Override
+    // since servlet 3.1 @Override
     public void setContentLengthLong( long len ) {
         throw new UnsupportedOperationException();
     }

@@ -58,3 +58,8 @@ Bundle-ClassPath: lib-refine/openrefine-trunk.jar,
  lib-refine/poi-ooxml-3.13-20150929.jar,
  lib-refine/poi-ooxml-schemas-3.13-20150929.jar,
  lib-refine/poi-3.13-20150929.jar
+Export-Package: com.google.refine.importing,
+ com.google.refine.model,
+ org.polymap.core.data.refine,
+ org.polymap.core.data.refine.impl,
+ org.polymap.core.data.refine.json

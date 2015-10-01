@@ -5,6 +5,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Map;
 
@@ -39,7 +41,7 @@ public class ImportCSVTest {
 
     @Test
     @Ignore
-    public void testTheLongWay() throws JSONException {
+    public void testTheLongWay() throws JSONException, FileNotFoundException {
         Object response = service.post( CreateImportingJobCommand.class, null );
         assertEquals( "{ \"jobID\" : 1 }", response.toString() );
 
@@ -53,7 +55,7 @@ public class ImportCSVTest {
 
         File wohngebiete = new File(
                 this.getClass().getResource( "/data/wohngebiete_sachsen.csv" ).getFile() );
-        response = service.importFile( wohngebiete );
+        response = service.importFile( new FileInputStream( wohngebiete ), "wohngebiete_sachsen.csv", "text/csv" );
         assertTrue( response.toString().startsWith( "{\"code\":\"ok\"" ) );
         JSONObject jsonResponse = new JSONObject( response.toString() );
 
@@ -153,11 +155,11 @@ public class ImportCSVTest {
 
 
     @Test
-    public void testSSV() throws JSONException {
+    public void testSSV() throws JSONException, FileNotFoundException {
         // ; separated file
         File wohngebiete = new File(
                 this.getClass().getResource( "/data/wohngebiete_sachsen.csv" ).getFile() );
-        ImportResponse response = service.importFile( wohngebiete );
+        ImportResponse response = service.importFile( new FileInputStream( wohngebiete ), "wohngebiete_sachsen.csv", "text/csv" );
         assertEquals( ";", response.options().separator() );
 
         // get the loaded models
@@ -185,11 +187,11 @@ public class ImportCSVTest {
 
 
     @Test
-    public void testMoviesTSV() throws JSONException {
+    public void testMoviesTSV() throws JSONException, FileNotFoundException {
         // ; separated file
         File wohngebiete = new File(
                 this.getClass().getResource( "/data/movies-condensed.tsv" ).getFile() );
-        ImportResponse response = service.importFile( wohngebiete );
+        ImportResponse response = service.importFile( new FileInputStream( wohngebiete ), "wohngebiete_sachsen.csv", "text/csv" );
         assertEquals( "\\t", response.options().separator() );
 
         // get the loaded models

@@ -1,8 +1,8 @@
 package org.polymap.core.data.refine.impl;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.security.Principal;
@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import javax.servlet.AsyncContext;
@@ -25,8 +24,9 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.Part;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.net.HttpHeaders;
 
@@ -34,11 +34,19 @@ public class RefineRequest
         implements HttpServletRequest {
 
     private Map<String,String> params;
-    private File file;
+
+    private InputStream        file;
+
     private Map<String,String> headers;
 
 
-    public RefineRequest( Map<String,String> params, Map<String,String> headers, File file ) {
+    public RefineRequest( Map<String,String> params, Map<String,String> headers ) {
+        this( params, headers, null, null );
+    }
+
+
+    public RefineRequest( Map<String,String> params, Map<String,String> headers, InputStream file,
+            String fileName ) {
         this.params = new TreeMap<String,String>( String.CASE_INSENSITIVE_ORDER );
         if (params != null) {
             this.params.putAll( params );
@@ -48,6 +56,9 @@ public class RefineRequest
             this.headers.putAll( headers );
         }
         this.file = file;
+        if (!StringUtils.isEmpty( fileName )) {
+            this.params.put( "fileName", fileName );
+        }
     }
 
 
@@ -59,12 +70,11 @@ public class RefineRequest
         }
         return query.toString();
     }
-    
 
 
     @Override
     public String getParameter( String name ) {
-       return params.get( name );
+        return params.get( name );
     }
 
 
@@ -74,7 +84,6 @@ public class RefineRequest
         // default
         return Charset.forName( "iso-8859-1" ).name();
     }
-    
 
 
     @Override
@@ -109,7 +118,6 @@ public class RefineRequest
         throw new UnsupportedOperationException();
 
     }
-
 
 
     @Override
@@ -519,25 +527,25 @@ public class RefineRequest
     }
 
 
-    @Override
+    // since servlet 3.1 @Override
     public long getContentLengthLong() {
         throw new UnsupportedOperationException();
     }
 
 
-    @Override
+    // since servlet 3.1 @Override
     public String changeSessionId() {
         throw new UnsupportedOperationException();
     }
 
 
-    @Override
-    public <T extends HttpUpgradeHandler> T upgrade( Class<T> handlerClass ) {
-        throw new UnsupportedOperationException();
-    }
+    // since servlet 3.1 @Override
+//    public <T extends HttpUpgradeHandler> T upgrade( Class<T> handlerClass ) {
+//        throw new UnsupportedOperationException();
+//    }
 
 
-    public File file() {
+    public InputStream file() {
         return file;
     }
 

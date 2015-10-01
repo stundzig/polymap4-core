@@ -1,20 +1,11 @@
 package org.polymap.core.data.refine.impl;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.File;
-import java.io.IOException;
-import java.util.List;
+import java.io.InputStream;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -23,18 +14,14 @@ import org.polymap.core.data.refine.RefineService;
 import org.polymap.core.data.refine.json.JSONUtil;
 
 import com.google.common.collect.Maps;
+import com.google.common.net.HttpHeaders;
 import com.google.refine.ProjectManager;
 import com.google.refine.RefineServlet;
 import com.google.refine.commands.Command;
-import com.google.refine.commands.importing.GetImportingJobStatusCommand;
 import com.google.refine.commands.importing.ImportingControllerCommand;
-import com.google.refine.importing.FilebasedImportingController;
 import com.google.refine.importing.ImportingJob;
 import com.google.refine.importing.ImportingManager;
 import com.google.refine.io.FileProjectManager;
-import com.google.refine.model.ColumnModel;
-import com.google.refine.model.Project;
-import com.google.refine.model.Row;
 
 public class RefineServiceImpl
         implements RefineService {
@@ -165,13 +152,13 @@ public class RefineServiceImpl
 
 
     private RefineRequest createRequest( Map<String,String> params ) {
-        return createRequest( params, null, null );
+        return createRequest( params, null, null, null );
     }
 
 
     private RefineRequest createRequest( Map<String,String> params, Map<String,String> headers,
-            File file ) {
-        return new RefineRequest( params, headers, file );
+            InputStream file, String fileName ) {
+        return new RefineRequest( params, headers, file, fileName );
     }
 
 
@@ -186,7 +173,7 @@ public class RefineServiceImpl
     }
 
 
-    public ImportResponse importFile( File wohng ) {
+    public ImportResponse importFile( InputStream wohng, String fileName, String mimeType ) {
         try {
             // create the job
             ImportingJob job = ImportingManager.createJob();
@@ -196,10 +183,11 @@ public class RefineServiceImpl
             params.put( "jobID", String.valueOf( job.id ) );
             params.put( "subCommand", "load-raw-data" );
             params.put( "controller", "core/filebased-importing-controller" );
+            params.put( HttpHeaders.CONTENT_TYPE, mimeType );
             Map<String,String> headers = Maps.newHashMap();
             RefineResponse response = createResponse();
             command( ImportingControllerCommand.class )
-                    .doPost( createRequest( params, headers, wohng ), response );
+                    .doPost( createRequest( params, headers, wohng, fileName ), response );
 
             // initialize the parser ui
             String format = JSONUtil.getString( job.getOrCreateDefaultConfig(),
