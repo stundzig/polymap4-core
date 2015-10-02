@@ -1,12 +1,7 @@
 package org.polymap.core.data.refine.impl;
 
-import java.util.Map;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import com.google.common.collect.Maps;
-import com.google.refine.util.JSONUtilities;
 
 public class FormatAndOptions {
 
@@ -16,8 +11,8 @@ public class FormatAndOptions {
     public FormatAndOptions() {
         try {
             store = new JSONObject(
-                    "{\"encoding\":\"\",\"separator\":\"\\t\",\"ignoreLines\":-1,\"headerLines\":1,\"skipDataLines\":0,\"limit\":-1,\"storeBlankRows\":true,"
-                            + "\"guessCellValueTypes\":false,\"processQuotes\":true,\"storeBlankCellsAsNulls\":true,\"includeFileSources\":false}" );
+                    "{\"encoding\":\"ISO-8859-1\",\"separator\":\"\\t\",\"ignoreLines\":-1,\"headerLines\":1,\"skipDataLines\":0,\"limit\":-1,\"storeBlankRows\":false,"
+                            + "\"guessCellValueTypes\":true,\"processQuotes\":true,\"storeBlankCellsAsNulls\":true,\"includeFileSources\":true}" );
         }
         catch (JSONException e) {
             throw new RuntimeException( e );

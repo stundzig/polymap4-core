@@ -189,9 +189,20 @@ public class RefineServiceImpl
             command( ImportingControllerCommand.class )
                     .doPost( createRequest( params, headers, wohng, fileName ), response );
 
+            
+//             get-importing-job-status bis done
+             
+            log.info( "JOB:" + job.getOrCreateDefaultConfig().toString() );
+             
             // initialize the parser ui
             String format = JSONUtil.getString( job.getOrCreateDefaultConfig(),
                     "retrievalRecord.files[0].format", null );
+            
+            while (format == null) {
+                Thread.sleep( 100 );
+                format = JSONUtil.getString( job.getOrCreateDefaultConfig(),
+                        "retrievalRecord.files[0].format", null );
+            }
             
             params.clear();
             params.put( "jobID", String.valueOf( job.id ) );
@@ -217,6 +228,7 @@ public class RefineServiceImpl
             command( ImportingControllerCommand.class ).doPost( createRequest( params ), response );
 //            JSONObject updateFormatAndOptionsResponse = new JSONObject( response.result().toString() );
             
+            log.info( "imported " + job + "; " + options.toJSON());
             ImportResponse resp = new ImportResponse();
             resp.setJob( job );
             resp.setOptions( options );
