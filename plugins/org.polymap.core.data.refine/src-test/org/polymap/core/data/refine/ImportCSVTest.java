@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +32,7 @@ import com.google.refine.model.Row;
 public class ImportCSVTest {
 
     private RefineServiceImpl service;
+    private Object rowsResponse;
 
 
     @Before
@@ -201,5 +203,45 @@ public class ImportCSVTest {
         List<Row> rows = response.job().project.rows;
         assertEquals( 20, rows.size() );
         assertEquals( "Jay Roach", rows.get( 3 ).cells.get( 1 ).value );
+    }
+    
+    @Test
+    public void testEncodingTSV() throws JSONException, FileNotFoundException {
+        // ; separated file
+        File wohngebiete = new File(
+                this.getClass().getResource( "/data/example-utf8.tsv" ).getFile() );
+        ImportResponse response = service.importFile( new FileInputStream( wohngebiete ), "wohngebiete_sachsen.csv", "text/csv" );
+        assertEquals( "\\t", response.options().separator() );
+
+        // get the loaded models
+        ColumnModel columns = response.job().project.columnModel;
+        assertEquals( 12, columns.columns.size() );
+
+        List<Row> rows = response.job().project.rows;
+        assertEquals( 2, rows.size() );
+//        assertEquals( "Jay Roach", rows.get( 1 ).cells.get( 4 ).value );
+        Serializable valueBefore = rows.get( 1 ).cells.get( 3 ).value;
+        
+        response.options().setEncoding( "ISO-8859-1" );
+
+//        Map<String,String> params = Maps.newHashMap();
+//        params.put( "importingJobID", "" + response.job().id );
+//        params.put( "start", "0" );
+//        params.put( "limit", "5" );
+//        rowsResponse = service.post( GetRowsCommand.class, params );
+//        JSONObject rowsResponseBefore = new JSONObject( rowsResponse.toString() );
+        
+        service.updateOptions( response.job(), response.options() );
+
+        rows = response.job().project.rows;
+        assertEquals( 2, rows.size() );
+        Serializable valueAfter = rows.get( 1 ).cells.get( 3 ).value;
+        assertEquals( valueBefore, valueAfter );
+////        Serializable valueBefore = rows.get( 1 ).cells.get( 4 ).value;
+//        
+//        rowsResponse = service.post( GetRowsCommand.class, params );
+//        JSONObject rowsResponseAfter = new JSONObject( rowsResponse.toString() );
+        
+        
     }
 }

@@ -107,31 +107,30 @@ public class RefineServiceImpl
     }
 
 
-//    public Object get( Class<? extends Command> commandClazz ) {
-//        try {
-//            Command command = command( commandClazz );
-//            RefineResponse response = createResponse();
-//            command.doGet( createRequest( null ), response );
-//            return response.result();
-//        }
-//        catch (Exception e) {
-//            throw new RuntimeException( e );
-//        }
-//    }
-//
-//
-//    public Object post( Class<? extends Command> commandClazz ) {
-//        try {
-//            Command command = command( commandClazz );
-//            RefineResponse response = createResponse();
-//            command.doPost( createRequest( null ), response );
-//            return response.result();
-//        }
-//        catch (Exception e) {
-//            throw new RuntimeException( e );
-//        }
-//    }
-
+    // public Object get( Class<? extends Command> commandClazz ) {
+    // try {
+    // Command command = command( commandClazz );
+    // RefineResponse response = createResponse();
+    // command.doGet( createRequest( null ), response );
+    // return response.result();
+    // }
+    // catch (Exception e) {
+    // throw new RuntimeException( e );
+    // }
+    // }
+    //
+    //
+    // public Object post( Class<? extends Command> commandClazz ) {
+    // try {
+    // Command command = command( commandClazz );
+    // RefineResponse response = createResponse();
+    // command.doPost( createRequest( null ), response );
+    // return response.result();
+    // }
+    // catch (Exception e) {
+    // throw new RuntimeException( e );
+    // }
+    // }
 
     public Object post( Class<? extends Command> commandClazz, Map<String,String> params ) {
         try {
@@ -189,36 +188,42 @@ public class RefineServiceImpl
             command( ImportingControllerCommand.class )
                     .doPost( createRequest( params, headers, wohng, fileName ), response );
 
-            
-//             get-importing-job-status bis done
-             
+            // get-importing-job-status bis done
+
             log.info( "JOB:" + job.getOrCreateDefaultConfig().toString() );
-             
+
             // initialize the parser ui
             String format = JSONUtil.getString( job.getOrCreateDefaultConfig(),
                     "retrievalRecord.files[0].format", null );
-            
+//            String encoding = JSONUtil.getString( job.getOrCreateDefaultConfig(),
+//                    "retrievalRecord.files[0].declaredEncoding", null );
+
             while (format == null) {
                 Thread.sleep( 100 );
                 format = JSONUtil.getString( job.getOrCreateDefaultConfig(),
                         "retrievalRecord.files[0].format", null );
             }
-            
+
             params.clear();
             params.put( "jobID", String.valueOf( job.id ) );
             params.put( "subCommand", "initialize-parser-ui" );
             params.put( "controller", "core/default-importing-controller" );
             params.put( "format", format );
+            // TODO add options here
             command( ImportingControllerCommand.class ).doPost( createRequest( params ), response );
             JSONObject initializeParserUiResponse = new JSONObject( response.result().toString() );
-            if ("\\t".equals( JSONUtil.getString( initializeParserUiResponse, "options.separator", null ) )) {
-                // separator is not one of , or , try some more separator
-            }
+//            if ("\\t".equals(
+//                    JSONUtil.getString( initializeParserUiResponse, "options.separator", null ) )) {
+//                // separator is not one of , or , try some more separator
+//            }
             // update/initialize all options and create the project
-            FormatAndOptions options = new FormatAndOptions(initializeParserUiResponse.getJSONObject( "options" ));
-            options.setFormat(format);
+            FormatAndOptions options = new FormatAndOptions(
+                    initializeParserUiResponse.getJSONObject( "options" ) );
+            options.setFormat( format );
+//            options.setEncoding( encoding );
             
-            // try to find the best separator, with the most columns in the resulting model.
+            // try to find the best separator, with the most columns in the resulting
+            // model.
             params.clear();
             params.put( "jobID", String.valueOf( job.id ) );
             params.put( "subCommand", "update-format-and-options" );
@@ -226,13 +231,14 @@ public class RefineServiceImpl
             params.put( "format", format );
             params.put( "options", options.toJSON().toString() );
             command( ImportingControllerCommand.class ).doPost( createRequest( params ), response );
-//            JSONObject updateFormatAndOptionsResponse = new JSONObject( response.result().toString() );
-            
-            log.info( "imported " + job + "; " + options.toJSON());
+            // JSONObject updateFormatAndOptionsResponse = new JSONObject(
+            // response.result().toString() );
+
+            log.info( "imported " + job + "; " + options.toJSON() );
             ImportResponse resp = new ImportResponse();
             resp.setJob( job );
             resp.setOptions( options );
-            
+
             return resp;
         }
         catch (Exception e) {
@@ -240,21 +246,22 @@ public class RefineServiceImpl
         }
     }
 
-//
-//    public ColumnModel columns( String jobId ) {
-//        ImportingJob job = ImportingManager.getJob( Long.parseLong( jobId ) );
-//        Project project = job.project;
-//        return project.columnModel;
-//    }
-//
-//
-//    public List<Row> rows( String jobId ) {
-//        ImportingJob job = ImportingManager.getJob( Long.parseLong( jobId ) );
-//        Project project = job.project;
-//        return project.rows;
-//    }
 
+    //
+    // public ColumnModel columns( String jobId ) {
+    // ImportingJob job = ImportingManager.getJob( Long.parseLong( jobId ) );
+    // Project project = job.project;
+    // return project.columnModel;
+    // }
+    //
+    //
+    // public List<Row> rows( String jobId ) {
+    // ImportingJob job = ImportingManager.getJob( Long.parseLong( jobId ) );
+    // Project project = job.project;
+    // return project.rows;
+    // }
 
+    @Override
     public void updateOptions( ImportingJob job, FormatAndOptions options ) {
         try {
             RefineResponse response = createResponse();
@@ -265,13 +272,15 @@ public class RefineServiceImpl
             params.put( "format", options.format() );
             params.put( "options", options.toJSON().toString() );
             command( ImportingControllerCommand.class ).doPost( createRequest( params ), response );
-//
-//            ImportResponse resp = new ImportResponse();
-//            resp.setJob( job );
-//            resp.setProject( job.project );
-//            resp.setOptions( options );
-//            
-//            return resp;
+
+            log.info( "updated job " + job.updating + "; " + options.toJSON() );
+            //
+            // ImportResponse resp = new ImportResponse();
+            // resp.setJob( job );
+            // resp.setProject( job.project );
+            // resp.setOptions( options );
+            //
+            // return resp;
         }
         catch (Exception e) {
             throw new RuntimeException( e );

@@ -29,6 +29,7 @@ import javax.servlet.http.Part;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.google.common.base.Charsets;
 import com.google.common.net.HttpHeaders;
 
 public class RefineRequest
@@ -83,7 +84,7 @@ public class RefineRequest
     public String getCharacterEncoding() {
         // encodings are from ava.nio.charset.Charset.availableCharsets()
         // default
-        return Charset.forName( "iso-8859-1" ).name();
+        return null;//Charsets.ISO_8859_1.name();
     }
 
 
