@@ -1,11 +1,16 @@
 package org.polymap.core.data.refine.impl;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import javax.activation.MimetypesFileTypeMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -151,7 +156,7 @@ public class RefineServiceImpl
 
 
     private RefineRequest createRequest( Map<String,String> params ) {
-        return createRequest( params, null, null, null );
+        return new RefineRequest( params, null );
     }
 
 
@@ -172,21 +177,20 @@ public class RefineServiceImpl
     }
 
 
-    public ImportResponse importFile( InputStream wohng, String fileName, String mimeType ) {
+    private <T extends FormatAndOptions> ImportResponse<T> importData( RefineRequest request,
+            T options ) {
         try {
             // create the job
             ImportingJob job = ImportingManager.createJob();
 
             // copy the file
-            Map<String,String> params = Maps.newHashMap();
-            params.put( "jobID", String.valueOf( job.id ) );
-            params.put( "subCommand", "load-raw-data" );
-            params.put( "controller", "core/filebased-importing-controller" );
-            params.put( HttpHeaders.CONTENT_TYPE, mimeType );
-            Map<String,String> headers = Maps.newHashMap();
+            // Map<String,String> params = Maps.newHashMap();
+            request.setParameter( "jobID", String.valueOf( job.id ) );
+            request.setParameter( "subCommand", "load-raw-data" );
+            request.setParameter( "controller", "core/filebased-importing-controller" );
+            // Map<String,String> headers = Maps.newHashMap();
             RefineResponse response = createResponse();
-            command( ImportingControllerCommand.class )
-                    .doPost( createRequest( params, headers, wohng, fileName ), response );
+            command( ImportingControllerCommand.class ).doPost( request, response );
 
             // get-importing-job-status bis done
 
@@ -195,8 +199,8 @@ public class RefineServiceImpl
             // initialize the parser ui
             String format = JSONUtil.getString( job.getOrCreateDefaultConfig(),
                     "retrievalRecord.files[0].format", null );
-//            String encoding = JSONUtil.getString( job.getOrCreateDefaultConfig(),
-//                    "retrievalRecord.files[0].declaredEncoding", null );
+            // String encoding = JSONUtil.getString( job.getOrCreateDefaultConfig(),
+            // "retrievalRecord.files[0].declaredEncoding", null );
 
             while (format == null) {
                 Thread.sleep( 100 );
@@ -204,24 +208,27 @@ public class RefineServiceImpl
                         "retrievalRecord.files[0].format", null );
             }
 
-            params.clear();
+            Map<String,String> params = Maps.newHashMap();
             params.put( "jobID", String.valueOf( job.id ) );
             params.put( "subCommand", "initialize-parser-ui" );
             params.put( "controller", "core/default-importing-controller" );
             params.put( "format", format );
+            if (options != null) {
+                params.put( "options", options.toString() );
+            }
             // TODO add options here
             command( ImportingControllerCommand.class ).doPost( createRequest( params ), response );
             JSONObject initializeParserUiResponse = new JSONObject( response.result().toString() );
-//            if ("\\t".equals(
-//                    JSONUtil.getString( initializeParserUiResponse, "options.separator", null ) )) {
-//                // separator is not one of , or , try some more separator
-//            }
+            // if ("\\t".equals(
+            // JSONUtil.getString( initializeParserUiResponse, "options.separator",
+            // null ) )) {
+            // // separator is not one of , or , try some more separator
+            // }
             // update/initialize all options and create the project
-            FormatAndOptions options = new FormatAndOptions(
-                    initializeParserUiResponse.getJSONObject( "options" ) );
+            options.putAll( initializeParserUiResponse.getJSONObject( "options" ) );
             options.setFormat( format );
-//            options.setEncoding( encoding );
-            
+            // options.setEncoding( encoding );
+
             // try to find the best separator, with the most columns in the resulting
             // model.
             params.clear();
@@ -229,13 +236,13 @@ public class RefineServiceImpl
             params.put( "subCommand", "update-format-and-options" );
             params.put( "controller", "core/default-importing-controller" );
             params.put( "format", format );
-            params.put( "options", options.toJSON().toString() );
+            params.put( "options", options.toString() );
             command( ImportingControllerCommand.class ).doPost( createRequest( params ), response );
             // JSONObject updateFormatAndOptionsResponse = new JSONObject(
             // response.result().toString() );
 
-            log.info( "imported " + job + "; " + options.toJSON() );
-            ImportResponse resp = new ImportResponse();
+            log.info( "imported " + job + "; " + options.store() );
+            ImportResponse<T> resp = new ImportResponse<T>();
             resp.setJob( job );
             resp.setOptions( options );
 
@@ -247,22 +254,27 @@ public class RefineServiceImpl
     }
 
 
-    //
-    // public ColumnModel columns( String jobId ) {
-    // ImportingJob job = ImportingManager.getJob( Long.parseLong( jobId ) );
-    // Project project = job.project;
-    // return project.columnModel;
-    // }
-    //
-    //
-    // public List<Row> rows( String jobId ) {
-    // ImportingJob job = ImportingManager.getJob( Long.parseLong( jobId ) );
-    // Project project = job.project;
-    // return project.rows;
-    // }
+    @Override
+    public <T extends FormatAndOptions> ImportResponse<T> importFile( File file, T options ) {
+        Map<String,String> params = Maps.newHashMap();
+        params.put( HttpHeaders.CONTENT_TYPE,
+                MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType( file ) );
+        return importData( new RefineRequest( params, Maps.newHashMap(), file, file.getName() ),
+                options );
+    }
+
 
     @Override
-    public void updateOptions( ImportingJob job, FormatAndOptions options ) {
+    public <T extends FormatAndOptions> ImportResponse<T> importStream( InputStream in,
+            String fileName, String mimeType, T options ) {
+        Map<String,String> params = Maps.newHashMap();
+        params.put( HttpHeaders.CONTENT_TYPE, mimeType );
+        return importData( new RefineRequest( params, Maps.newHashMap(), in, fileName ), options );
+    }
+
+
+    @Override
+    public void updateOptions( ImportingJob job, CSVFormatAndOptions options ) {
         try {
             RefineResponse response = createResponse();
             Map<String,String> params = Maps.newHashMap();
@@ -270,10 +282,10 @@ public class RefineServiceImpl
             params.put( "subCommand", "update-format-and-options" );
             params.put( "controller", "core/default-importing-controller" );
             params.put( "format", options.format() );
-            params.put( "options", options.toJSON().toString() );
+            params.put( "options", options.toString() );
             command( ImportingControllerCommand.class ).doPost( createRequest( params ), response );
 
-            log.info( "updated job " + job.updating + "; " + options.toJSON() );
+            log.info( "updated job " + job.updating + "; " + options );
             //
             // ImportResponse resp = new ImportResponse();
             // resp.setJob( job );

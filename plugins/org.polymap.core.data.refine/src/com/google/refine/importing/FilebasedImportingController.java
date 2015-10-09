@@ -50,6 +50,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.polymap.core.data.refine.impl.RefineRequest;
 
+import com.google.common.io.Files;
 import com.google.refine.commands.HttpUtilities;
 import com.google.refine.importing.ImportingUtilities.Progress;
 import com.google.refine.util.JSONUtilities;
@@ -192,30 +193,40 @@ public class FilebasedImportingController
                     throws Exception {
         JSONArray fileRecords = new JSONArray();
         JSONUtilities.safePut( retrievalRecord, "files", fileRecords );
-        if (request.file() != null) {
-            InputStream origin = request.file();
-
-            File file = ImportingUtilities.allocateFile( rawDataDir, request.getParameter( "fileName" ) );
-
-            JSONObject fileRecord = new JSONObject();
-            JSONUtilities.safePut( fileRecord, "origin", "upload" );
-            JSONUtilities.safePut( fileRecord, "declaredEncoding", request.getCharacterEncoding() );
-            JSONUtilities.safePut( fileRecord, "declaredMimeType", request.getContentType() );
-            JSONUtilities.safePut( fileRecord, "fileName", file.getName() );
-            JSONUtilities.safePut( fileRecord, "location",
-                    ImportingUtilities.getRelativePath( file, rawDataDir ) );
-            //
-            // progress.setProgress(
-            // "Saving file " + file.getName() + " locally (" +
-            // NumberFormat.getIntegerInstance().format( fileSize ) + " bytes)",
-            // calculateProgressPercent( update.totalExpectedSize,
-            // update.totalRetrievedSize ) );
-
-            JSONUtilities.safePut( fileRecord, "size", ImportingUtilities
-                    .saveStreamToFile( origin, file, null ) );
-            ImportingUtilities.postProcessRetrievedFile( rawDataDir, file, fileRecord, fileRecords,
-                    progress );
+        if (request.stream() == null && request.file() == null) {
+            throw new IllegalStateException( "either stream or file must not be null" );
         }
+
+        File targetFile = ImportingUtilities.allocateFile( rawDataDir,
+                request.getParameter( "fileName" ) );
+
+        InputStream origin = request.stream();
+
+        if (request.file() != null) {
+            Files.move( request.file(), targetFile );
+        }
+
+        JSONObject fileRecord = new JSONObject();
+        JSONUtilities.safePut( fileRecord, "origin", "upload" );
+        JSONUtilities.safePut( fileRecord, "declaredEncoding", request.getCharacterEncoding() );
+        JSONUtilities.safePut( fileRecord, "declaredMimeType", request.getContentType() );
+        JSONUtilities.safePut( fileRecord, "fileName", targetFile.getName() );
+        JSONUtilities.safePut( fileRecord, "location",
+                ImportingUtilities.getRelativePath( targetFile, rawDataDir ) );
+                //
+                // progress.setProgress(
+                // "Saving file " + file.getName() + " locally (" +
+                // NumberFormat.getIntegerInstance().format( fileSize ) + " bytes)",
+                // calculateProgressPercent( update.totalExpectedSize,
+                // update.totalRetrievedSize ) );
+
+        // if base was a file simply use them, otherwise copy the stream into the new
+        // targetFile
+        JSONUtilities.safePut( fileRecord, "size", (request.file() != null) ? targetFile.length()
+                : ImportingUtilities.saveStreamToFile( origin, targetFile, null ) );
+        ImportingUtilities.postProcessRetrievedFile( rawDataDir, targetFile, fileRecord,
+                fileRecords, progress );
+
         JSONUtilities.safePut( retrievalRecord, "uploadCount", 1 );
         JSONUtilities.safePut( retrievalRecord, "downloadCount", 0 );
         JSONUtilities.safePut( retrievalRecord, "clipboardCount", 0 );

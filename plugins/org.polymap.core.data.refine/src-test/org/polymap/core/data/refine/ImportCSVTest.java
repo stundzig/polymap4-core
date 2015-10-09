@@ -6,22 +6,21 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.polymap.core.data.refine.impl.FormatAndOptions;
+import org.polymap.core.data.refine.impl.CSVFormatAndOptions;
 import org.polymap.core.data.refine.impl.ImportResponse;
 import org.polymap.core.data.refine.impl.RefineServiceImpl;
 import org.polymap.core.data.refine.json.JSONUtil;
 
 import com.google.common.collect.Maps;
+import com.google.common.io.Files;
 import com.google.refine.commands.importing.CreateImportingJobCommand;
 import com.google.refine.commands.importing.ImportingControllerCommand;
 import com.google.refine.commands.project.GetModelsCommand;
@@ -32,7 +31,8 @@ import com.google.refine.model.Row;
 public class ImportCSVTest {
 
     private RefineServiceImpl service;
-    private Object rowsResponse;
+
+    private Object            rowsResponse;
 
 
     @Before
@@ -43,7 +43,7 @@ public class ImportCSVTest {
 
     @Test
     @Ignore
-    public void testTheLongWay() throws JSONException, FileNotFoundException {
+    public void testTheLongWay() throws Exception {
         Object response = service.post( CreateImportingJobCommand.class, null );
         assertEquals( "{ \"jobID\" : 1 }", response.toString() );
 
@@ -57,7 +57,9 @@ public class ImportCSVTest {
 
         File wohngebiete = new File(
                 this.getClass().getResource( "/data/wohngebiete_sachsen.csv" ).getFile() );
-        response = service.importFile( new FileInputStream( wohngebiete ), "wohngebiete_sachsen.csv", "text/csv" );
+        
+        response = service.importStream( new FileInputStream( wohngebiete ),
+                "wohngebiete_sachsen.csv", "text/csv", CSVFormatAndOptions.createDefault() );
         assertTrue( response.toString().startsWith( "{\"code\":\"ok\"" ) );
         JSONObject jsonResponse = new JSONObject( response.toString() );
 
@@ -157,11 +159,14 @@ public class ImportCSVTest {
 
 
     @Test
-    public void testSSV() throws JSONException, FileNotFoundException {
+    public void testSSV() throws Exception {
         // ; separated file
         File wohngebiete = new File(
                 this.getClass().getResource( "/data/wohngebiete_sachsen.csv" ).getFile() );
-        ImportResponse response = service.importFile( new FileInputStream( wohngebiete ), "wohngebiete_sachsen.csv", "text/csv" );
+        File tmp = File.createTempFile( "foo", ".csv" );
+        Files.copy( wohngebiete, tmp );
+        ImportResponse<CSVFormatAndOptions> response = service.importFile( tmp,
+                CSVFormatAndOptions.createDefault() );
         assertEquals( ";", response.options().separator() );
 
         // get the loaded models
@@ -175,7 +180,7 @@ public class ImportCSVTest {
         assertEquals( "neue Wohngeb. mit 1 od.2 Wohnungen, Räume u.Fläche d.Wohn.,",
                 rows.get( 1 ).cells.get( 0 ).value );
 
-        FormatAndOptions options = response.options();
+        CSVFormatAndOptions options = response.options();
         options.setSeparator( "\\t" );
         service.updateOptions( response.job(), options );
         columns = response.job().project.columnModel;
@@ -189,11 +194,13 @@ public class ImportCSVTest {
 
 
     @Test
-    public void testMoviesTSV() throws JSONException, FileNotFoundException {
+    public void testMoviesTSV() throws Exception {
         // ; separated file
         File wohngebiete = new File(
                 this.getClass().getResource( "/data/movies-condensed.tsv" ).getFile() );
-        ImportResponse response = service.importFile( new FileInputStream( wohngebiete ), "wohngebiete_sachsen.csv", "text/csv" );
+        ImportResponse<CSVFormatAndOptions> response = service.importStream(
+                new FileInputStream( wohngebiete ), "wohngebiete_sachsen.csv", "text/csv",
+                CSVFormatAndOptions.createDefault() );
         assertEquals( "\\t", response.options().separator() );
 
         // get the loaded models
@@ -204,13 +211,15 @@ public class ImportCSVTest {
         assertEquals( 20, rows.size() );
         assertEquals( "Jay Roach", rows.get( 3 ).cells.get( 1 ).value );
     }
-    
+
+
     @Test
-    public void testEncodingTSV() throws JSONException, FileNotFoundException {
+    public void testEncodingTSV() throws Exception {
         // ; separated file
         File wohngebiete = new File(
                 this.getClass().getResource( "/data/example-utf8.tsv" ).getFile() );
-        ImportResponse response = service.importFile( new FileInputStream( wohngebiete ), "wohngebiete_sachsen.csv", "text/csv" );
+        ImportResponse<CSVFormatAndOptions> response = service.importFile( wohngebiete,
+                CSVFormatAndOptions.createDefault() );
         assertEquals( "\\t", response.options().separator() );
 
         // get the loaded models
@@ -219,29 +228,28 @@ public class ImportCSVTest {
 
         List<Row> rows = response.job().project.rows;
         assertEquals( 2, rows.size() );
-//        assertEquals( "Jay Roach", rows.get( 1 ).cells.get( 4 ).value );
+        // assertEquals( "Jay Roach", rows.get( 1 ).cells.get( 4 ).value );
         Serializable valueBefore = rows.get( 1 ).cells.get( 3 ).value;
-        
+
         response.options().setEncoding( "ISO-8859-1" );
 
-//        Map<String,String> params = Maps.newHashMap();
-//        params.put( "importingJobID", "" + response.job().id );
-//        params.put( "start", "0" );
-//        params.put( "limit", "5" );
-//        rowsResponse = service.post( GetRowsCommand.class, params );
-//        JSONObject rowsResponseBefore = new JSONObject( rowsResponse.toString() );
-        
+        // Map<String,String> params = Maps.newHashMap();
+        // params.put( "importingJobID", "" + response.job().id );
+        // params.put( "start", "0" );
+        // params.put( "limit", "5" );
+        // rowsResponse = service.post( GetRowsCommand.class, params );
+        // JSONObject rowsResponseBefore = new JSONObject( rowsResponse.toString() );
+
         service.updateOptions( response.job(), response.options() );
 
         rows = response.job().project.rows;
         assertEquals( 2, rows.size() );
         Serializable valueAfter = rows.get( 1 ).cells.get( 3 ).value;
         assertEquals( valueBefore, valueAfter );
-////        Serializable valueBefore = rows.get( 1 ).cells.get( 4 ).value;
-//        
-//        rowsResponse = service.post( GetRowsCommand.class, params );
-//        JSONObject rowsResponseAfter = new JSONObject( rowsResponse.toString() );
-        
-        
+        //// Serializable valueBefore = rows.get( 1 ).cells.get( 4 ).value;
+        //
+        // rowsResponse = service.post( GetRowsCommand.class, params );
+        // JSONObject rowsResponseAfter = new JSONObject( rowsResponse.toString() );
+
     }
 }

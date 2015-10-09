@@ -1,13 +1,14 @@
 package org.polymap.core.data.refine.impl;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
 import java.security.Principal;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
@@ -29,7 +30,6 @@ import javax.servlet.http.Part;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.google.common.base.Charsets;
 import com.google.common.net.HttpHeaders;
 
 public class RefineRequest
@@ -37,29 +37,56 @@ public class RefineRequest
 
     private Map<String,String> params;
 
-    private InputStream        file;
+    private File               file;
+
+    private InputStream        stream;
 
     private Map<String,String> headers;
 
 
     public RefineRequest( Map<String,String> params, Map<String,String> headers ) {
-        this( params, headers, null, null );
+        setParams( params );
+        setHeaders( headers );
     }
 
 
-    public RefineRequest( Map<String,String> params, Map<String,String> headers, InputStream file,
+    public RefineRequest( Map<String,String> params, Map<String,String> headers, InputStream stream,
             String fileName ) {
-        this.params = new TreeMap<String,String>( String.CASE_INSENSITIVE_ORDER );
-        if (params != null) {
-            this.params.putAll( params );
+        setParams( params );
+        setHeaders( headers );
+        setFileName( fileName );
+        this.stream = stream;
+    }
+
+
+    public RefineRequest( Map<String,String> params, HashMap<String,String> headers, File file,
+            String fileName ) {
+        setParams( params );
+        setHeaders( headers );
+        setFileName( fileName );
+        this.file = file;
+    }
+
+
+    private void setFileName( String fileName ) {
+        if (!StringUtils.isEmpty( fileName )) {
+            this.params.put( "fileName", fileName );
         }
+    }
+
+
+    private void setHeaders( Map<String,String> headers ) {
         this.headers = new TreeMap<String,String>( String.CASE_INSENSITIVE_ORDER );
         if (headers != null) {
             this.headers.putAll( headers );
         }
-        this.file = file;
-        if (!StringUtils.isEmpty( fileName )) {
-            this.params.put( "fileName", fileName );
+    }
+
+
+    private void setParams( Map<String,String> params ) {
+        this.params = new TreeMap<String,String>( String.CASE_INSENSITIVE_ORDER );
+        if (params != null) {
+            this.params.putAll( params );
         }
     }
 
@@ -80,11 +107,16 @@ public class RefineRequest
     }
 
 
+    public void setParameter( String name, String value ) {
+        params.put( name, value );
+    }
+
+
     @Override
     public String getCharacterEncoding() {
         // encodings are from ava.nio.charset.Charset.availableCharsets()
         // default
-        return null;//Charsets.ISO_8859_1.name();
+        return null;// Charsets.ISO_8859_1.name();
     }
 
 
@@ -542,13 +574,17 @@ public class RefineRequest
 
 
     // since servlet 3.1 @Override
-//    public <T extends HttpUpgradeHandler> T upgrade( Class<T> handlerClass ) {
-//        throw new UnsupportedOperationException();
-//    }
+    // public <T extends HttpUpgradeHandler> T upgrade( Class<T> handlerClass ) {
+    // throw new UnsupportedOperationException();
+    // }
 
-
-    public InputStream file() {
+    public File file() {
         return file;
+    }
+
+
+    public InputStream stream() {
+        return stream;
     }
 
 }

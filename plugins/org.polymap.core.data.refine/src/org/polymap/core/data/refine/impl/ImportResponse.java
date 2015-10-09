@@ -3,11 +3,11 @@ package org.polymap.core.data.refine.impl;
 import com.google.refine.importing.ImportingJob;
 import com.google.refine.model.Project;
 
-public class ImportResponse {
+public class ImportResponse<T extends FormatAndOptions> {
 
     private ImportingJob     job;
 
-    private FormatAndOptions options;
+    private T options;
 
 
     public void setJob( ImportingJob job ) {
@@ -15,7 +15,7 @@ public class ImportResponse {
     }
 
 
-    public void setOptions( FormatAndOptions options ) {
+    public void setOptions( T options ) {
         this.options = options;
     }
 
@@ -25,7 +25,7 @@ public class ImportResponse {
     }
 
 
-    public FormatAndOptions options() {
+    public T options() {
         return options;
     }
 }
