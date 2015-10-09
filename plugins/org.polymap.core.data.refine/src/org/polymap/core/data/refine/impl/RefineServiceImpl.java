@@ -227,6 +227,7 @@ public class RefineServiceImpl
             // update/initialize all options and create the project
             options.putAll( initializeParserUiResponse.getJSONObject( "options" ) );
             options.setFormat( format );
+            //options.put( "guessCellValueTypes", true );
             // options.setEncoding( encoding );
 
             // try to find the best separator, with the most columns in the resulting
