@@ -1,9 +1,6 @@
 package org.polymap.core.data.refine.impl;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -213,10 +210,6 @@ public class RefineServiceImpl
             params.put( "subCommand", "initialize-parser-ui" );
             params.put( "controller", "core/default-importing-controller" );
             params.put( "format", format );
-            if (options != null) {
-                params.put( "options", options.toString() );
-            }
-            // TODO add options here
             command( ImportingControllerCommand.class ).doPost( createRequest( params ), response );
             JSONObject initializeParserUiResponse = new JSONObject( response.result().toString() );
             // if ("\\t".equals(
@@ -275,7 +268,7 @@ public class RefineServiceImpl
 
 
     @Override
-    public void updateOptions( ImportingJob job, CSVFormatAndOptions options ) {
+    public void updateOptions( ImportingJob job, FormatAndOptions options ) {
         try {
             RefineResponse response = createResponse();
             Map<String,String> params = Maps.newHashMap();

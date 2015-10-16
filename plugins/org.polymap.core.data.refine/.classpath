@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="lib-refine/json-20141113.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
@@ -24,7 +25,6 @@
 	<classpathentry exported="true" kind="lib" path="lib-refine/jackson-core-asl-1.9.12.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib-refine/jcl-over-slf4j-1.5.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib-refine/jrdf-0.5.6.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib-refine/json-20100208.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib-refine/jsoup-1.4.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib-refine/lessen-trunk-r8.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib-refine/log4j-1.2.15.jar"/>
