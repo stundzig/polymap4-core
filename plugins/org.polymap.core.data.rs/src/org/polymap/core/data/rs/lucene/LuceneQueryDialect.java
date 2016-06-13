@@ -386,7 +386,7 @@ public final class LuceneQueryDialect
             }
             // isNull
             else if (filter instanceof PropertyIsNull) {
-                throw new UnsupportedOperationException( "PropertyIsNull" );
+                return processIsNull( (PropertyIsNull)filter );
             }
             // between
             else if (filter instanceof PropertyIsBetween) {
@@ -548,6 +548,14 @@ public final class LuceneQueryDialect
 
             return store.getValueCoders().searchQuery( 
                     new QueryExpression.Match( fieldname, value ) );
+        }
+        
+        
+        protected org.apache.lucene.search.Query processIsNull( PropertyIsNull predicate ) {
+            PropertyName prop = (PropertyName)predicate.getExpression();
+            String fieldname = prop.getPropertyName();
+            return store.getValueCoders().searchQuery( 
+                    new QueryExpression.IsNull( fieldname ) );
         }
     }
     

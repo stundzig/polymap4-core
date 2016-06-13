@@ -20,13 +20,17 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Index;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.TermRangeQuery;
 import org.apache.lucene.search.WildcardQuery;
-
 import org.polymap.recordstore.QueryExpression;
 import org.polymap.recordstore.QueryExpression.Equal;
+import org.polymap.recordstore.QueryExpression.IsNull;
 import org.polymap.recordstore.QueryExpression.Match;
 
 
@@ -95,6 +99,22 @@ public class StringValueCoder
                     return new WildcardQuery( new Term( matchExp.key, value ) );
                 }
             }
+        }
+        // ISNULL
+        else if (exp instanceof QueryExpression.IsNull) {
+            IsNull isNullExp = (IsNull)exp;
+            BooleanQuery nullFieldsOnlyQuery = new BooleanQuery(); 
+            MatchAllDocsQuery matchAllDocsQuery = new MatchAllDocsQuery(); 
+            // ConstantScoreRangeQuery does not throw a BooleanQuery.TooManyClauses exception. 
+            // A regular RangeQuery does throws a BooleanQuery.TooManyClauses exception. 
+            // Obviously the range may be different depending on the nature of the field involved. 
+            TermRangeQuery nonNullFieldsRangeQuery = new TermRangeQuery( isNullExp.key, "0", // zero
+                    "z", true, true );
+
+            // Load up the BooleanQuery 
+            nullFieldsOnlyQuery.add( new MatchAllDocsQuery(), BooleanClause.Occur.MUST ); 
+            nullFieldsOnlyQuery.add( nonNullFieldsRangeQuery, BooleanClause.Occur.MUST_NOT );
+            return nullFieldsOnlyQuery;
         }
         return null;
     }

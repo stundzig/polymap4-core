@@ -164,6 +164,42 @@ public abstract class QueryExpression {
 
 
     /**
+     * 
+     */
+    public static class IsNull
+            extends QueryExpression {
+
+        public final String key;
+
+        public IsNull( String key ) {
+            this.key = key;
+        }
+
+        public boolean evaluate( IRecordState record ) {
+            return record.get( key ) == null;
+        }
+        
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((key == null) ? 0 : key.hashCode());
+            return result;
+        }
+
+        public boolean equals( Object obj ) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj instanceof IsNull &&
+                    obj.getClass() != obj.getClass()) {
+                IsNull rhs = (IsNull)obj;
+                return key.equals( rhs.key );
+            }
+            return false;
+        }
+    }
+
+    /**
      * 'IsLike' query. Wildcards: *, ?
      */
     public static class Match<T>
